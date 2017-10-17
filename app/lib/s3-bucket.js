@@ -73,27 +73,24 @@ export default EmberObject.extend({
   },
 
   load: on('init', observer('queryUrl', function() {
-    let self = this;
     this.set('isLoading', true);
-
-    this.loadAllPages('', []).then(function(files) {
-      self.set('isLoading', false);
-      self.set('files', files.sort(function(a, b) {
+    this.loadAllPages('', []).then((files) => {
+      this.set('isLoading', false);
+      this.set('files', files.sort(function(a, b) {
         return b.lastModified - a.lastModified;
       }));
     });
   })),
 
   loadAllPages(marker, files) {
-    let self = this;
     let baseUrl = this.get('objectBaseUrl');
+    let queryURL = `${this.get('queryUrl')}&marker=${marker}`;
 
-    return $.get(this.get('queryUrl') + '&marker=' + marker).then(function(data) {
+    return $.get(queryURL).then((data) => {
       let contents = data.getElementsByTagName('Contents');
       let isTruncated = data.getElementsByTagName('IsTruncated')[0].firstChild.data === "true";
       let length = contents.length;
-
-      self.set('response', data);
+      this.set('response', data);
 
       for (let i = 0; i < length; i++) {
         let size = contents[i].getElementsByTagName('Size')[0].firstChild.data;
@@ -113,7 +110,7 @@ export default EmberObject.extend({
 
       if (isTruncated) {
         let lastFile = files[files.length - 1];
-        return self.loadAllPages(lastFile.get('name'), files);
+        return this.loadAllPages(lastFile.get('name'), files);
       } else {
         return files;
       }
