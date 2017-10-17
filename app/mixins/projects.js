@@ -8,31 +8,30 @@ export default Mixin.create({
     let projects = Project.find(this.get('channel'));
     let bucket = this.get('model');
 
-    debugger;
     if (this.isIndexController) {
       bucket = this.get('model.releaseSteps');
     }
 
     projects.forEach((project) => {
-      // if (project.channel === 'beta') {
-      //   project.isEmberBeta = project.projectName === 'Ember';
+      if (project.channel === 'beta') {
+        project.isEmberBeta = project.projectName === 'Ember';
 
-      //   [1,2,3,4,5].forEach((increment) => {
-      //     let versionParts = project.lastRelease.split('.');
-      //     let currentBetaNumber = parseInt(versionParts[versionParts.length - 1], 10);
+        [1,2,3,4,5].forEach((increment) => {
+          let versionParts = project.lastRelease.split('.');
+          let currentBetaNumber = parseInt(versionParts[versionParts.length - 1], 10);
 
-      //     project[`beta${increment}Completed`] = increment <= currentBetaNumber;
-      //     project[`isBeta${increment}`] = increment === currentBetaNumber;
-      //   });
+          project[`beta${increment}Completed`] = increment <= currentBetaNumber;
+          project[`isBeta${increment}`] = increment === currentBetaNumber;
+        });
 
-      //   let release = Project.find('release', project.projectName)[0];
+        let release = Project.find('release', project.projectName)[0];
 
-      //   // no releases exist for ember-data (yet)
-      //   if (release) {
-      //     project.lastStableVersion = release.initialVersion;
-      //     project.lastStableDate = release.initialReleaseDate;
-      //   }
-      // }
+        // no releases exist for ember-data (yet)
+        if (release) {
+          project.lastStableVersion = release.initialVersion;
+          project.lastStableDate = release.initialReleaseDate;
+        }
+      }
 
       project.files = bucket.filterFiles(project.projectFilter, project.ignoreFiles);
       project.description = this.description(project);

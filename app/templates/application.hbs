@@ -2,7 +2,7 @@
   <ol id="toc-list">
     <li class="level-1 {{if isIndexActive 'selected'}}">{{#link-to 'index'}}Home{{/link-to}}</li>
     <li class="level-1 {{if isChannelsActive 'selected'}}">
-      <a>Channels</a>
+      {{link-to 'Channels' 'release'}}
       <ol style="display:block">
         <li class="level-3 {{if isReleaseActive 'sub-selected'}}">{{#link-to 'release'}}Release{{/link-to}}</li>
         <li class="level-3 {{if isBetaActive 'sub-selected'}}">{{#link-to 'beta'}}Beta{{/link-to}}</li>
