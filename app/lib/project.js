@@ -1,4 +1,5 @@
 import EmberObject from '@ember/object';
+import { isNone } from '@ember/utils';
 
 import EmberTagged from '../fixtures/ember/tagged';
 import EmberCanary from '../fixtures/ember/canary';
@@ -11,7 +12,6 @@ import EmberDataTagged from '../fixtures/ember-data/tagged';
 import EmberDataBeta from '../fixtures/ember-data/beta';
 import EmberDataCanary from '../fixtures/ember-data/canary';
 
-const Project = EmberObject.extend();
 
 const FIXTURES = [
   EmberTagged,
@@ -25,11 +25,29 @@ const FIXTURES = [
   EmberDataCanary
 ];
 
-Project.reopenClass({
-  all(channel) {
-    let projects = FIXTURES;
+const Project = EmberObject.extend({});
 
-    if (channel) { projects = FIXTURES.filterBy('channel', channel); }
+Project.reopenClass({
+
+  _fixtures: FIXTURES,
+
+  load(npmRegistry) {
+    if (isNone(npmRegistry)) {
+      throw new Error("NPM registry was not provided");
+    }
+
+    return npmRegistry.fetch().then((projects) => {
+      let fixtures = this._fixtures.filter((f) => !['beta', 'release', 'lts'].includes(f.channel));
+      this._fixtures = fixtures.concat([projects.release, projects.beta, projects.lts]);
+    });
+  },
+
+  all(channel) {
+    let projects = this._fixtures;
+
+    if (channel) {
+      projects = this._fixtures.filterBy('channel', channel);
+    }
 
     return projects.map(obj => Project.create(obj));
   },
@@ -37,7 +55,9 @@ Project.reopenClass({
   find(channel, name) {
     let allProjects = this.all(channel);
 
-    if (!name) { return allProjects; }
+    if (!name) {
+      return allProjects;
+    }
 
     return allProjects.filterBy('projectName', name);
   },

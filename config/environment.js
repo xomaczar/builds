@@ -27,6 +27,9 @@ module.exports = function(environment) {
     }
   };
 
+  // Returns `npm info ember-source` like payload
+  ENV.npmInfoURL = 'https://s3.amazonaws.com/npm/ember-source';
+
   if (environment === 'development') {
     // ENV.APP.LOG_RESOLVER = true;
     // ENV.APP.LOG_ACTIVE_GENERATION = true;
